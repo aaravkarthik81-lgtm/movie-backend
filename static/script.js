@@ -168,7 +168,7 @@ function setLanguage(language) {
 
 async function loadMovies() {
     try {
-        const response = await fetch(`${API_URL}/movies`);
+        const response = await fetch(`/movies`);
 
         if (!response.ok) {
             throw new Error(`Movies API returned ${response.status}`);
@@ -289,7 +289,7 @@ grid?.addEventListener("click", async event => {
         button.disabled = true;
         button.textContent = "Loading showtimes...";
 
-        const response = await fetch(`${API_URL}/screenings`);
+        const response = await fetch(`/screenings`);
 
         if (!response.ok) {
             throw new Error(`Screenings API returned ${response.status}`);
