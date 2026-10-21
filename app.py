@@ -10,7 +10,7 @@ def get_db():
       host="gateway01.ap-northeast-1.prod.aws.tidbcloud.com",
       port=4000,
       user="333GSioHP1qxJgS.root",
-      password="YOUR_ACTUAL_PASSWORD_HERE",
+      password="gYtU2Ug85w75A4Ul",
       database="movie_db",
       ssl_verify_cert=True,
       ssl_verify_identity=True,
