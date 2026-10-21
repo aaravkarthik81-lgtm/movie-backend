@@ -1,5 +1,5 @@
 ```javascript
-const API_URL = "http://127.0.0.1:5000";
+const API_URL = "";
 
 const grid = document.getElementById("movieGrid");
 const searchForm = document.getElementById("searchForm");
