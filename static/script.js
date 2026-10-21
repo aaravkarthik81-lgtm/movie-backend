@@ -42,7 +42,7 @@ function posterMarkup(movie) {
     const language = safeText(movie.language || "Movie");
     const posterUrl = movie.poster_url;
 
-    return `<div class="poster" style="--poster-a:${a};--poster-b:${b}">
+    return <div class="poster" style="--poster-a:${a};--poster-b:${b}">
         <div class="poster-copy">
             <small>CINEBOOK ORIGINALS</small>
             <strong>${name}</strong>
