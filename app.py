@@ -93,6 +93,16 @@ def get_movies():
   db.close()
   return jsonify(results)
 
+@app.route("/screenings", methods=["GET"])
+def get_screenings():
+  db = get_db()
+  cursor = db.cursor(dictionary=True)
+  cursor.execute("SELECT * FROM Screenings")  # Assuming your table is named Screenings
+  results = cursor.fetchall()
+  cursor.close()
+  db.close()
+  return jsonify(results)
+
 
 if __name__ == "__main__":
   app.run(debug=True, port=5000)
