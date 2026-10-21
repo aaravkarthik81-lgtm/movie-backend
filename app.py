@@ -1,10 +1,19 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
+from fllask_cors import CORS
 import mysql.connector
 
 app = Flask(__name__)
+CORS(app)
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/seats')
+def seats():
+    return render_template('seat.html')
 
 
-# Database connection helper
 def get_db():
   return mysql.connector.connect(
       host="gateway01.ap-northeast-1.prod.aws.tidbcloud.com",
