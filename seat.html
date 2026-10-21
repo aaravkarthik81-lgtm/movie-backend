@@ -1,0 +1,597 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CineBook | Select Seats</title>
+
+<style>
+* { box-sizing: border-box; }
+
+:root {
+  --gold: #f5c451;
+  --bg: #101116;
+  --panel: #191b23;
+  --muted: #a5a7b2;
+  --available: #292d38;
+  --selected: #f5c451;
+  --booked: #555966;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: #fff;
+}
+
+header {
+  padding: 18px 7%;
+  border-bottom: 1px solid #30313a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 25px;
+  font-weight: bold;
+  color: var(--gold);
+}
+
+header a {
+  color: white;
+  text-decoration: none;
+}
+
+main {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 0 18px 40px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--muted);
+  margin-bottom: 25px;
+}
+
+.show-card, .booking-card {
+  background: var(--panel);
+  border: 1px solid #30313a;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 22px;
+}
+
+.show-card h2 {
+  margin: 0 0 10px;
+  color: var(--gold);
+}
+
+.show-card p {
+  margin: 7px 0;
+  color: #d0d0d6;
+}
+
+.message {
+  padding: 12px;
+  border-radius: 8px;
+  background: #252a37;
+  color: #f5d98c;
+  margin: 12px 0;
+  display: none;
+  overflow-wrap: anywhere;
+}
+
+.legend {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 22px 0;
+  color: #d0d0d6;
+  font-size: 13px;
+}
+
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.dot {
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  border-radius: 4px;
+  background: var(--available);
+  border: 1px solid #737887;
+}
+
+.dot.selected { background: var(--gold); border-color: var(--gold); }
+.dot.booked { background: var(--booked); border-color: var(--booked); }
+
+.screen {
+  width: 85%;
+  margin: 28px auto 36px;
+  padding: 12px;
+  text-align: center;
+  color: #111;
+  background: linear-gradient(90deg, #a77927, #ffe8a1, #a77927);
+  border-radius: 50% 50% 8px 8px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  font-size: 13px;
+  box-shadow: 0 8px 30px #f5c45120;
+}
+
+#seatMap {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  align-items: center;
+  overflow-x: auto;
+  padding: 8px 0 25px;
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: max-content;
+}
+
+.row-label {
+  width: 24px;
+  text-align: center;
+  color: var(--gold);
+  font-weight: bold;
+}
+
+.seat {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid #747988;
+  border-radius: 8px 8px 4px 4px;
+  background: var(--available);
+  color: #fff;
+  cursor: pointer;
+  font-size: 10px;
+  transition: 0.15s;
+}
+
+.seat:hover:not(:disabled) {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.seat.selected {
+  background: var(--selected);
+  border-color: var(--selected);
+  color: #17130a;
+  font-weight: bold;
+}
+
+.seat.booked {
+  background: var(--booked);
+  border-color: var(--booked);
+  color: #b7b9c2;
+  cursor: not-allowed;
+}
+
+.seat.premium {
+  border-top: 3px solid #b48cff;
+}
+
+.seat.selected.premium {
+  border-top-color: #b48cff;
+}
+
+.seat-gap {
+  width: 20px;
+}
+
+.booking-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 15px;
+}
+
+.booking-card h3 { margin: 0 0 8px; }
+.booking-card p { margin: 5px 0; color: var(--muted); }
+
+.total {
+  color: var(--gold);
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+button.action {
+  padding: 12px 18px;
+  border: 1px solid #555966;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.clear {
+  color: white;
+  background: transparent;
+}
+
+.continue {
+  color: #17130a;
+  background: var(--gold);
+  border-color: var(--gold) !important;
+}
+
+button.action:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 550px) {
+  header { padding: 16px; }
+  main { padding: 0 10px 25px; }
+  .booking-card { grid-template-columns: 1fr; }
+  .seat { width: 29px; height: 31px; font-size: 9px; }
+  .seat-row { gap: 4px; }
+  .seat-gap { width: 8px; }
+  .screen { width: 95%; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">CineBook</div>
+  <a href="index.html">← Back to Movies</a>
+</header>
+
+<main>
+  <h1>Select Your Seats</h1>
+  <p class="subtitle">Choose your seats and review your booking</p>
+
+  <section class="show-card">
+    <h2 id="movieTitle">CineBook Movie Experience</h2>
+    <p id="theatreName">CineBook Cinema</p>
+    <p id="showDetails">Select your preferred seats</p>
+    <div id="message" class="message" role="status"></div>
+  </section>
+
+  <div class="legend">
+    <span><i class="dot"></i> Available</span>
+    <span><i class="dot selected"></i> Selected</span>
+    <span><i class="dot booked"></i> Booked</span>
+    <span><i class="dot" style="border-top:3px solid #b48cff"></i> Premium</span>
+  </div>
+
+  <div class="screen">SCREEN</div>
+
+  <div id="seatMap" aria-label="Seat selection"></div>
+
+  <section class="booking-card">
+    <div>
+      <h3>Booking Summary</h3>
+      <p id="selectedSeats">Selected seats: None</p>
+      <p id="basePrice">Ticket total: ₹0.00</p>
+      <p id="tax">GST (18%): ₹0.00</p>
+      <div class="total" id="grandTotal">Total: ₹0.00</div>
+    </div>
+
+    <div class="actions">
+      <button class="action clear" id="clearBtn">Clear Selection</button>
+      <button class="action continue" id="continueBtn">Continue</button>
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+
+const API = "http://127.0.0.1:5000";
+const params = new URLSearchParams(window.location.search);
+const screeningId =
+    params.get("screening_id") ||
+    params.get("screeningId") ||
+    params.get("id");
+console.log("Current URL:", window.location.href);
+console.log("Screening ID:", screeningId);
+
+const movieTitle = document.getElementById("movieTitle");
+const theatreName = document.getElementById("theatreName");
+const showDetails = document.getElementById("showDetails");
+const message = document.getElementById("message");
+const seatMap = document.getElementById("seatMap");
+const selectedSeats = document.getElementById("selectedSeats");
+const basePrice = document.getElementById("basePrice");
+const tax = document.getElementById("tax");
+const grandTotal = document.getElementById("grandTotal");
+const continueBtn = document.getElementById("continueBtn");
+
+let seats = [];
+let selected = new Map();
+let demoMode = false;
+
+movieTitle.textContent = params.get("movie") || "CineBook Movie Experience";
+theatreName.textContent = params.get("theatre") || "CineBook Cinema";
+showDetails.textContent = params.get("time") || "Choose a showtime";
+
+function showMessage(text) {
+  message.textContent = text;
+  message.style.display = "block";
+}
+
+function hideMessage() {
+  message.textContent = "";
+  message.style.display = "none";
+}
+
+function makeDemoSeats() {
+  const rows = [
+    { name: "A", type: "Standard", price: 150 },
+    { name: "B", type: "Standard", price: 150 },
+    { name: "C", type: "Standard", price: 150 },
+    { name: "D", type: "Premium", price: 220 },
+    { name: "E", type: "Premium", price: 220 }
+  ];
+
+  return rows.flatMap((row, rowIndex) =>
+    Array.from({ length: 10 }, (_, i) => {
+      const number = i + 1;
+      const label = row.name + number;
+      const unavailable = label === "B3" || label === "D8";
+
+      return {
+        seat_id: rowIndex * 10 + number,
+        seat_number: label,
+        class: row.type,
+        price: row.price,
+        seat_status: unavailable ? "BOOKED" : "AVAILABLE"
+      };
+    })
+  );
+}
+
+function isBooked(seat) {
+  const status = String(
+    seat.seat_status || seat.status || "AVAILABLE"
+  ).toUpperCase();
+
+  return ["BOOKED", "CONFIRMED", "UNAVAILABLE", "RESERVED"].includes(status);
+}
+
+function seatLabel(seat) {
+  return String(seat.seat_number || seat.seat_name || seat.label || "");
+}
+
+function renderSeats() {
+  seatMap.innerHTML = "";
+  selected.clear();
+
+  if (!seats.length) {
+    seatMap.textContent = "No seats were returned by the server.";
+    updateSummary();
+    return;
+  }
+
+  // Group seats by their row letter, e.g. A1, A2, B1, B2.
+  const groups = {};
+
+  seats.forEach((seat, index) => {
+    const label = seatLabel(seat);
+    const match = label.match(/^([A-Za-z]+)/);
+    const rowName = match ? match[1] : "Seats";
+
+    if (!groups[rowName]) groups[rowName] = [];
+    groups[rowName].push({ ...seat, _index: index });
+  });
+
+  Object.keys(groups).sort().forEach(rowName => {
+    const row = document.createElement("div");
+    row.className = "seat-row";
+
+    const label = document.createElement("span");
+    label.className = "row-label";
+    label.textContent = rowName;
+    row.appendChild(label);
+
+    groups[rowName].forEach((seat, index) => {
+      // Add an aisle in the middle.
+      if (index === Math.ceil(groups[rowName].length / 2)) {
+        const gap = document.createElement("span");
+        gap.className = "seat-gap";
+        row.appendChild(gap);
+      }
+
+      const btn = document.createElement("button");
+      const name = seatLabel(seat);
+      const booked = isBooked(seat);
+      const premium = String(seat.class || seat.seat_class || "")
+        .toLowerCase().includes("premium");
+
+      btn.type = "button";
+      btn.className = "seat" + (premium ? " premium" : "");
+      btn.textContent = name;
+      btn.title = name + " — ₹" + Number(seat.price || 150);
+
+      if (booked) {
+        btn.classList.add("booked");
+        btn.disabled = true;
+        btn.title += " (Booked)";
+      } else {
+        btn.addEventListener("click", () => {
+          if (selected.has(seat._index)) {
+            selected.delete(seat._index);
+            btn.classList.remove("selected");
+          } else {
+            if (selected.size >= 6) {
+              showMessage("You can select a maximum of 6 seats.");
+              return;
+            }
+
+            hideMessage();
+            selected.set(seat._index, seat);
+            btn.classList.add("selected");
+          }
+
+          updateSummary();
+        });
+      }
+
+      row.appendChild(btn);
+    });
+
+    seatMap.appendChild(row);
+  });
+
+  updateSummary();
+}
+
+function updateSummary() {
+  const chosen = [...selected.values()];
+  const labels = chosen.map(seatLabel);
+  const subtotal = chosen.reduce(
+    (sum, seat) => sum + Number(seat.price || 150), 0
+  );
+  const gst = subtotal * 0.18;
+
+  selectedSeats.textContent = "Selected seats: " + (labels.join(", ") || "None");
+  basePrice.textContent = "Ticket total: ₹" + subtotal.toFixed(2);
+  tax.textContent = "GST (18%): ₹" + gst.toFixed(2);
+  grandTotal.textContent = "Total: ₹" + (subtotal + gst).toFixed(2);
+}
+
+async function loadShowDetails() {
+  if (!screeningId) return;
+
+  try {
+    const response = await fetch(API + "/screenings");
+    if (!response.ok) return;
+
+    const data = await response.json();
+    const screenings = Array.isArray(data) ? data : (data.screenings || []);
+
+    const show = screenings.find(item =>
+      String(item.screening_id ?? item.Screening_ID ?? item.id) === screeningId
+    );
+
+    if (!show) return;
+
+    movieTitle.textContent =
+      params.get("movie") ||
+      show.movie_title || show.movie_name || show.title ||
+      movieTitle.textContent;
+
+    theatreName.textContent =
+      params.get("theatre") ||
+      show.theatre_name || show.theatre ||
+      theatreName.textContent;
+
+    showDetails.textContent =
+      params.get("time") ||
+      show.show_time || show.screening_time ||
+      showDetails.textContent;
+  } catch (error) {
+    console.warn("Could not load show details:", error);
+  }
+}
+
+async function loadSeats() {
+  if (!screeningId || !/^\d+$/.test(screeningId)) {
+    demoMode = true;
+    seats = makeDemoSeats();
+    renderSeats();
+    showMessage("Demo mode: select seats here. Open a showtime from the movie page to load actual seats.");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      API + "/seats?screening_id=" + encodeURIComponent(screeningId)
+    );
+
+    if (!response.ok) {
+      throw new Error("Seats API returned HTTP " + response.status);
+    }
+
+    const data = await response.json();
+    const actualSeats = Array.isArray(data) ? data : (data.seats || []);
+
+    if (!actualSeats.length) {
+      throw new Error("The API returned no seats for this screening.");
+    }
+
+    demoMode = false;
+    seats = actualSeats;
+    renderSeats();
+    hideMessage();
+  } catch (error) {
+    console.error("Could not load actual seats:", error);
+    demoMode = true;
+    seats = makeDemoSeats();
+    renderSeats();
+    showMessage("API connection failed. Demo seats are displayed so the page remains usable. " + error.message);
+  }
+}
+
+document.getElementById("clearBtn").addEventListener("click", () => {
+  selected.clear();
+  renderSeats();
+  hideMessage();
+});
+
+continueBtn.addEventListener("click", () => {
+  if (selected.size === 0) {
+    showMessage("Please select at least one available seat.");
+    return;
+  }
+
+  if (demoMode || !screeningId) {
+    showMessage("These are demo seats. Select a real showtime from the movie page before proceeding with a booking.");
+    return;
+  }
+
+  const booking = {
+    screening_id: Number(screeningId),
+    seats: [...selected.values()].map(seat => ({
+      seat_id: seat.seat_id,
+      seat_number: seatLabel(seat),
+      price: Number(seat.price || 150)
+    })),
+    subtotal: [...selected.values()].reduce(
+      (sum, seat) => sum + Number(seat.price || 150), 0
+    )
+  };
+
+  // Temporary hand-off only. This does not create an Oracle booking.
+  sessionStorage.setItem("cinebook_pending_booking", JSON.stringify(booking));
+
+  showMessage("Seats selected successfully. Booking details are ready for the next step.");
+  console.log("Pending booking:", booking);
+});
+
+loadShowDetails();
+loadSeats();
+</script>
+
+</body>
+</html>
