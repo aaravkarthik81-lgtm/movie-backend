@@ -15,7 +15,8 @@ def seats():
 
 
 def get_db():
-  return mysql.connector.connect(
+  print("Connecting")
+  db = mysql.connector.connect(
       host="gateway01.ap-northeast-1.prod.aws.tidbcloud.com",
       port=4000,
       user="333GSioHP1qxJgS.root",
@@ -24,7 +25,8 @@ def get_db():
       ssl_verify_cert=True,
       ssl_verify_identity=True,
   )
-
+  print("Connected")
+  return db
 
 # 1. Bill Calculation & Booking Route (Processing Logic)
 @app.route("/book", methods=["POST"])
