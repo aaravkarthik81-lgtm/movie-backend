@@ -7,10 +7,13 @@ app = Flask(__name__)
 # Database connection helper
 def get_db():
   return mysql.connector.connect(
-      host="localhost",
-      user="root",
-      password="your_password",  # Update with your MySQL password
+      host="gateway01.ap-northeast-1.prod.aws.tidbcloud.com",
+      port=4000,
+      user="333GSioHP1qxJgS.root",
+      password="YOUR_ACTUAL_PASSWORD_HERE",
       database="movie_db",
+      ssl_verify_cert=True,
+      ssl_verify_identity=True,
   )
 
 
