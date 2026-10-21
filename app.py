@@ -97,7 +97,7 @@ def get_movies():
 def get_screenings():
   db = get_db()
   cursor = db.cursor(dictionary=True)
-  cursor.execute("SELECT * FROM Screenings")  # Assuming your table is named Screenings
+  cursor.execute("SELECT * FROM Shows")  
   results = cursor.fetchall()
   cursor.close()
   db.close()
