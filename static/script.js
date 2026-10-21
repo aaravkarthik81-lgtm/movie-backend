@@ -42,18 +42,15 @@ function posterMarkup(movie) {
     const language = safeText(movie.language || "Movie");
     const posterUrl = movie.poster_url;
 
-    return `
-        <div class="poster" style="--poster-a:${a};--poster-b:${b}">
-            <div class="poster-copy">
-                <small>CINEBOOK ORIGINALS</small>
-                <strong>${name}</strong>
-                <span>${language.toUpperCase()}</span>
-            </div>
-            ${posterUrl
-                ? `<img src="${safeText(posterUrl)}" alt="${name} poster" loading="lazy" onerror="this.remove()">`
-                : ""}
-            <span class="poster-rating">★ <b>${Number(movie.rating || 0).toFixed(1)}</b></span>
-        </div>`;
+    return `<div class="poster" style="--poster-a:${a};--poster-b:${b}">
+        <div class="poster-copy">
+            <small>CINEBOOK ORIGINALS</small>
+            <strong>${name}</strong>
+            <span>${language.toUpperCase()}</span>
+        </div>
+        ${posterUrl ? `<img src="${safeText(posterUrl)}" alt="${name} poster" loading="lazy" onerror="this.remove()">` : ""}
+        <span class="poster-rating">★ <b>${Number(movie.rating || 0).toFixed(1)}</b></span>
+    </div>`;
 }
 
 function movieCard(movie) {
